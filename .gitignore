@@ -6,3 +6,4 @@ output_files/
 *.zip
 *.csv
 *.vhd.bak
+*.qws
