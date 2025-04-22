@@ -27,16 +27,16 @@ architecture ALU of ALU1bit is
 	BIN <= B when op(2) = '0' else BNegate;
 	
 	ResultAND <= AIN and BIN;
-	ResultOR <= AIN or BIN;
+	ResultOR  <= AIN or BIN;
 
 	set <= ResultAdd;
 	
 	stage0: fullAdd port map(Cin, AIN, BIN, ResultAdd, Cout);
 	
 	result <= ResultAND when op(1 downto 0) = "00" else
-				 ResultOR when op (1 downto 0) = "01" else
-				 ResultAdd when op (1 downto 0) = "10" else
-				 less when op (1 downto 0) = "11";
+				 ResultOR  when op(1 downto 0) = "01" else
+				 ResultAdd when op(1 downto 0) = "10" else
+				 less      when op(1 downto 0) = "11";
 
 
-	end ALU;
+end ALU;
