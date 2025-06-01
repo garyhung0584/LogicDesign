@@ -10,13 +10,13 @@ entity FSM is
 end;
 
 architecture logicfun of FSM is
-	type state_type is (S0, S1, S2a, S2b, S3, S4);
+	type state_type is (IDLE, LOAD, SHIFT, SUB, CHECK, DONE);
 	signal state, next_state: state_type;
 begin
 	process(clk, reset)
 	begin
 		if reset = '1' then
-			state <= S0;
+			state <= IDLE;
 		elsif rising_edge(clk) then
 			state <= next_state;
 		end if;
@@ -25,48 +25,44 @@ begin
 	process(state, w)
 	begin
 		case state is
-			when S0 =>
+			when IDLE =>
 				if w = '1' then
-					next_state <= S1;
+					next_state <= LOAD;
 				else
-					next_state <= S0;
+					next_state <= IDLE;
 				end if;
-
-			when S1 =>
-				if w = '0' then
-					next_state <= S2a;
+			when LOAD =>
+				next_state <= SHIFT;
+			when SHIFT =>
+				next_state <= SUB;
+			when SUB =>
+				next_state <= CHECK;
+			when CHECK =>
+				if w = '1' then -- w=1 means done (count reached)
+					next_state <= DONE;
 				else
-					next_state <= S2b;
+					next_state <= SHIFT;
 				end if;
-
-			when S2a =>
-				next_state <= S3;
-
-			when S2b =>
-				next_state <= S3;
-
-			when S3 =>
-				if w = '1' then
-					next_state <= S4;
+			when DONE =>
+				if w = '0' then -- w=0 means reset
+					next_state <= IDLE;
 				else
-					next_state <= S1;
+					next_state <= DONE;
 				end if;
-			when S4 =>
-					next_state <= S4;
 			when others =>
-				null;
+				next_state <= IDLE;
 		end case;
 	end process;
-	
+
 	process(state)
 	begin
 		case state is
-			when S0 => output <= "000";
-			when S1 => output <= "001";
-			when S2a => output <= "010";
-			when S2b => output <= "011";
-			when S3 => output <= "100";
-			when S4 => output <= "101";
+			when IDLE   => output <= "000";
+			when LOAD   => output <= "001";
+			when SHIFT  => output <= "010";
+			when SUB    => output <= "011";
+			when CHECK  => output <= "100";
+			when DONE   => output <= "101";
 			when others => output <= "000";
 		end case;
 	end process;
