@@ -12,7 +12,8 @@ entity control is
            red1       : out STD_LOGIC;
            yellow1    : out STD_LOGIC;
            green1     : out STD_LOGIC;
-           red_timer : out INTEGER range 0 to 16);
+           red_timer : out INTEGER range 0 to 16;
+           red_timer1 : out INTEGER range 0 to 16);
 end control;
 
 architecture Behavioral of control is
@@ -21,11 +22,13 @@ architecture Behavioral of control is
     signal state1 : state_type := G;
     signal count : integer range 0 to 5 := 0;
     signal red_seconds_left : integer range 0 to 16 := 16;
+    signal red_seconds_left1 : integer range 0 to 16 := 16;
 begin
     process(tunit_clk, reset)
     begin
         if reset = '1' then
             state <= R;
+            state1 <= G;
             count <= 0;
         elsif rising_edge(tunit_clk) then
             case state is
@@ -65,12 +68,20 @@ begin
 		 begin
 			  if reset = '1' then
 					red_seconds_left <= 16;
+					red_seconds_left1 <= 16;
 			  elsif rising_edge(one_sec_pulse) then
-					if state = R and red_seconds_left > 0 then
-						 red_seconds_left <= red_seconds_left - 1;
-						 elsif state = R and red_seconds_left = 0 then
+					if state /= R then
 						 red_seconds_left <= 16;
+					 else
+						red_seconds_left <= red_seconds_left - 1;
 					end if;
+					
+					if state1 /= R then
+						red_seconds_left1 <= 16;
+					else
+						red_seconds_left1 <= red_seconds_left1 - 1;
+					end if;
+					
 			  end if;
 		 end process;
 
@@ -83,4 +94,5 @@ begin
     green1  <= '1' when state1 = G else '0';
 
     red_timer <= red_seconds_left;
+    red_timer1 <= red_seconds_left1;
 end Behavioral;
